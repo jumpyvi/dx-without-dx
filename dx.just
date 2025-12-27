@@ -73,6 +73,6 @@ create-fbuilder-wrapper:
     #!/bin/sh
     exec flatpak run --command="flatpak-builder" "org.flatpak.Builder" "$@"
     EOF
-    chmod +x "$wrapper_path"
+    chmod +x "$HOME/.local/bin/flatpak-builder"
     echo "Please add ~/.local/bin to your path"
     echo "✅ Flatpak-Builder wrapper created"
