@@ -1,0 +1,50 @@
+tap "ublue-os/tap"
+
+# Base
+brew "gum"
+brew "fzf"
+brew "just"
+brew "jq"
+
+# Tools
+brew "git-svn"
+brew "numactl"
+brew "p7zip"
+brew "util-linux"
+brew "ddcutil"
+flatpak "de.leopoldluley.Clapgrep"
+flatpak "io.github.getnf.embellish"
+flatpak "io.github.ronniedroid.concessio"
+flatpak "me.iepure.devtoolbox"
+
+# Monitoring
+brew "bpftop"
+cask "android-platform-tools"
+flatpak "org.freedesktop.Bustle"
+flatpak "org.gnome.dspy"
+flatpak "org.pipewire.Helvum"
+
+# Shell
+brew "fish"
+brew "zsh"
+brew "tmux"
+
+# Containers/Virt
+brew "devcontainer"
+brew "podman-compose"
+flatpak "org.virt_manager.virt-manager"
+flatpak "org.virt_manager.virt_manager.Extension.Qemu"
+flatpak "io.podman_desktop.PodmanDesktop"
+
+# Remotes
+brew "cryfs"
+brew "rclone"
+brew "restic"
+brew "borgbackup"
+
+# Code
+brew "make"
+brew "gcc"
+cask "visual-studio-code-linux"
+vscode "ms-vscode-remote.remote-containers"
+flatpak "org.flatpak.Builder"
