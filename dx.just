@@ -37,7 +37,8 @@ setup-virt:
     set -euo pipefail
     brew install dnsmasq qemu libvirt
     flatpak install org.virt_manager.virt-manager
-    flatpak run org.virt_manager.virt-manager -c "qemu:///session?socket=/run/user/$(id -u $USER)/libvirt/libvirt-sock" &
+    echo "---------You can change the connection name and set autoconnect if desired---------"
+    flatpak run org.virt_manager.virt-manager -c "qemu:///session?socket=/run/user/$(id -u $USER)/libvirt/libvirt-sock" --show-host-summary &
 
     mkdir -p ~/.config/systemd/user/
 
