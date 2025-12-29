@@ -35,34 +35,33 @@ setup-vscode:
 setup-virt:
     #!/usr/bin/env bash
     set -euo pipefail
-    flatpak install org.virt_manager.virt-manager org.virt_manager.virt_manager.Extension.Qemu
-    flatpak run org.virt_manager.virt-manager -c "qemu:///session" &
+    brew install dnsmasq qemu libvirt
+    flatpak install org.virt_manager.virt-manager
+    flatpak run org.virt_manager.virt-manager -c "qemu:///session?socket=/run/user/$(id -u $USER)/libvirt/libvirt-sock" &
 
-    mkdir -p ~/.local/bin
+    mkdir -p ~/.config/systemd/user/
 
-    flatpak run --command=sh org.virt_manager.virt-manager -c 'ls -1 /app/lib/extensions/bin/ 2>/dev/null' | while read -r cmd; do
-        case "$cmd" in
-            *.la|*.a|*.txt|*.so|*.so.*) continue ;;
-            *)
-                wrapper_path="$HOME/.local/bin/$cmd"
-                cat > "$wrapper_path" <<EOF
+    cat > "$HOME/.config/systemd/user/libvirtd-brew.service" <<'EOF'
     #!/bin/sh
-    exec flatpak run --command="$cmd" "org.virt_manager.virt-manager" "\$@"
-    EOF
-                chmod +x "$wrapper_path"
-                ;;
-        esac
-    done
+    [Unit]
+    Description=Run brew's version of libvirtd in the background
 
-    cat > "$HOME/.local/bin/virsh" <<'EOF'
-    #!/bin/sh
-    exec flatpak run --command="virsh" "org.virt_manager.virt-manager" "$@"
-    EOF
-    chmod +x "$HOME/.local/bin/virsh"
+    [Service]
+    Type=simple
+    ExecStart=/home/linuxbrew/.linuxbrew/sbin/libvirtd
+    Environment="PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/bin:/bin"
+    Restart=always
+    RestartSec=10
 
-    echo ""
-    echo "Please add ~/.local/bin to your path"
-    echo "✅ Qemu wrappers created"
+    [Install]
+    WantedBy=default.target
+    EOF
+
+    systemctl --user daemon-reload
+    systemctl --user enable --now libvirtd-brew.service
+
+
+    echo "✅ Virt setup ready to use!"
 
 # Create wrapper for flatpak-builder
 create-fbuilder-wrapper:
