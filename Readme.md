@@ -1,5 +1,9 @@
 # Experimental just file for dx-less bluefins
 
+Making -dx useless, one just script at a time
+
+Tested on Bluefin-LTS and Bluefin-DL
+
 # Available
 
 ## dx-without-dx
@@ -22,12 +26,23 @@ Qemu/Virt utils will be in your accessible from your shell if brew is in your pa
 > [!NOTE]  
 > This will enable a user-wide unit at `~/.config/systemd/user/libvirtd-brew.service`
 
+## setup-colima (docker)
+> [!NOTE]
+> Colima uses a VM, it can be pretty ram heavy on a low to medium end computer. Use podman instead if possible.
+
+Will guide you trough the colima installation setup
+
 ## install-pkgs
-This will install all the package I could find in homebrew/flathub to replicate the -dx setup
+This will install all the packages I could find in homebrew/flathub to replicate the -dx setup </br>
+Check out the [brewfile](dx.brewfile)
 
 ## create-fbuilder-wrapper
 Create a simple wrapper so you can easily acces `flatpak-builder`
 
 
 # Missing
-- Rootful docker
+- True rootful docker
+- Input-remapper (experimental sysext available here: https://github.com/jumpyvi/not-enough-sysext)
+- Cockpit
+- YDoTool
+- LXC/LXD/Incus
