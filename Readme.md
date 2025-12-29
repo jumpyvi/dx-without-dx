@@ -4,6 +4,8 @@ Making -dx useless, one just script at a time
 
 Tested on Bluefin-LTS and Bluefin-DL
 
+Run one of the available commands with `just -f dx.just --choose` in the repo root
+
 # Available
 
 ## dx-without-dx
