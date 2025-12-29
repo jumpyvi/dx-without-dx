@@ -35,6 +35,7 @@ setup-vscode:
 setup-virt:
     #!/usr/bin/env bash
     set -euo pipefail
+    flatpak install org.virt_manager.virt-manager org.virt_manager.virt_manager.Extension.Qemu
     flatpak run org.virt_manager.virt-manager -c "qemu:///session" &
 
     mkdir -p ~/.local/bin
