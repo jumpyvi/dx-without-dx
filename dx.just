@@ -5,6 +5,57 @@ dx-without-dx: install-pkgs setup-vscode setup-virt create-fbuilder-wrapper
 install-pkgs:
     brew bundle install --file "dx.brewfile"
 
+setup-colima:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    
+    # Install dependencies
+    brew install colima docker gum
+    
+    # Config editing
+    echo "❔ Do you want to edit the default config?"
+    DO_EDIT=$(gum choose "Edit" "Keep Default")
+    
+    if [ "$DO_EDIT" = "Edit" ]; then
+        colima start --edit
+    else
+        colima start
+    fi
+    
+    # Systemd unit
+    echo "❔ Do you want to create an autostarting unit for colima (memory heavy)"
+    DO_UNIT=$(gum choose "Create unit file" "I will start it manually")
+    
+    if [ "$DO_UNIT" = "Create unit file" ]; then
+        mkdir -p "$HOME/.config/systemd/user"
+        cat > "$HOME/.config/systemd/user/colima.service" << 'ENDOFFILE'
+        [Unit]
+        Description=Run colima in the background
+
+        [Service]
+        Type=simple
+        ExecStart=/home/linuxbrew/.linuxbrew/bin/colima start --foreground
+        Environment="PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/usr/bin:/bin"
+        Restart=always
+        RestartSec=10
+
+        [Install]
+        WantedBy=default.target
+        
+    ENDOFFILE
+        
+        systemctl --user daemon-reload
+        systemctl --user enable --now colima.service
+        
+        echo "⚙️  Unit created and enabled"
+    else
+        echo "ℹ️  You can start colima with 'colima start', stop with 'colima stop'"
+    fi
+    
+    echo "🎉 Simply use the docker command as normal once colima is started"
+    echo "✅ Colima setup done"
+
+
 setup-vscode:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -43,7 +94,6 @@ setup-virt:
     mkdir -p ~/.config/systemd/user/
 
     cat > "$HOME/.config/systemd/user/libvirtd-brew.service" <<'EOF'
-    #!/bin/sh
     [Unit]
     Description=Run brew's version of libvirtd in the background
 
@@ -57,6 +107,7 @@ setup-virt:
     [Install]
     WantedBy=default.target
     EOF
+    echo "⚙️ Unit created"
 
     systemctl --user daemon-reload
     systemctl --user enable --now libvirtd-brew.service
