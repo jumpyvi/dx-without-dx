@@ -52,6 +52,8 @@ setup-virt-system:
     Documentation=man:virtlogd(8)
 
     [Service]
+    SELinuxContext=system_u:system_r:unconfined_service_t:s0
+    Environment="LD_LIBRARY_PATH=/var/home/linuxbrew/.linuxbrew/lib"
     ExecStart=$BREW_PREFIX/sbin/virtlogd -f $BREW_PREFIX/etc/libvirt/virtlogd.conf
     Restart=on-failure
 
@@ -67,6 +69,7 @@ setup-virt-system:
     After=network.target virtlogd.service
 
     [Service]
+    SELinuxContext=system_u:system_r:unconfined_service_t:s0
     Environment="PATH=$PATH:$BREW_PREFIX/bin"
     ExecStart=$BREW_PREFIX/sbin/libvirtd -f $BREW_PREFIX/etc/libvirt/libvirtd.conf
     ExecReload=/bin/kill -HUP \$MAINPID
