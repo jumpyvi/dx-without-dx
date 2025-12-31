@@ -83,7 +83,7 @@ setup-vscode:
     echo "✅ VS Code settings updated for Podman"
 
 
-setup-virt:
+setup-virt-session:
     #!/usr/bin/env bash
     set -euo pipefail
     brew install dnsmasq qemu libvirt
