@@ -21,7 +21,7 @@ setup-virt-system:
 
     gum spin --spinner dot --title "Installing virtualization packages... (it might take a while)" -- bash -c '
     set -e
-    brew install qemu jumpyvi/morebrew/libvirt-full
+    brew install qemu jumpyvi/morebrew/libvirt-full jumpyvi/morebrew/dmidecode
     flatpak install -y org.virt_manager.virt-manager
     '
 
