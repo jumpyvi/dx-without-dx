@@ -1,0 +1,26 @@
+[Unit]
+Description=Docker Application Container Engine
+Documentation=https://docs.docker.com/
+
+[Service]
+ExecStart=/bin/bash -c "env PATH='$PATH:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin' /home/linuxbrew/.linuxbrew/bin/dockerd"
+ExecReload=/bin/kill -s HUP $MAINPID
+
+Type=notify
+NotifyAccess=all
+KillMode=mixed
+Delegate=yes
+
+Restart=always
+RestartSec=2
+StartLimitBurst=3
+StartLimitInterval=60s
+
+TimeoutSec=0
+LimitNOFILE=infinity
+LimitNPROC=infinity
+LimitCORE=infinity
+TasksMax=infinity
+
+[Install]
+WantedBy=default.target
