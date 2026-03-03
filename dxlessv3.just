@@ -10,7 +10,7 @@ setup-docker-rootful:
     fi
 
     sudo -v
-    brew install --cask ublue-os/experimental-tap/docker-rootless-linux
+    brew install --cask ublue-os/experimental-tap/dockerd-linux
     sudo cp ./services/brew-containerd.service /etc/systemd/system/
     sudo cp ./services/brew-dockerd.service /etc/systemd/system/
     sudo systemctl daemon-reload
