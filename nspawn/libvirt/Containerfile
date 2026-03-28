@@ -1,0 +1,33 @@
+FROM fedora:43
+
+RUN dnf install -y libvirtd qemu qemu-kvm libvirt-daemon-kvm libvirt-daemon-config-network systemd sed vi
+
+RUN sed -i \
+    -e 's/^#*access_drivers =.*/access_drivers = [ "none" ]/' \
+    -e 's/^#*unix_sock_group =.*/unix_sock_group = "libvirt"/' \
+    -e 's/^#*unix_sock_rw_perms =.*/unix_sock_rw_perms = "0770"/' \
+    -e 's/^#*auth_unix_rw =.*/auth_unix_rw = "none"/' \
+    -e 's/^#*auth_unix_ro =.*/auth_unix_ro = "none"/' \
+    /etc/libvirt/libvirtd.conf
+
+RUN ln -s /usr/lib/systemd/system/libvirtd.service /etc/systemd/system/multi-user.target.wants/libvirtd.service && \
+    ln -s /usr/lib/systemd/system/virtlogd.service /etc/systemd/system/multi-user.target.wants/virtlogd.service && \
+    echo "enable libvirtd.service" > /usr/lib/systemd/system-preset/00-libvirt.preset && \
+    echo "enable libvirtd.socket" >> /usr/lib/systemd/system-preset/00-libvirt.preset && \
+    echo "enable virtlogd.service" >> /usr/lib/systemd/system-preset/00-libvirt.preset && \
+    echo "enable virtlogd.socket" >> /usr/lib/systemd/system-preset/00-libvirt.preset && \
+    systemctl preset-all
+
+RUN echo "root:nspawn" | chpasswd
+
+RUN groupadd -g 1000 virt && \
+    useradd -u 1000 -g 1000 -m -s /bin/bash virt
+
+RUN usermod -aG libvirt virt
+
+RUN dnf install -y sudo && \
+    echo "virt ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+ENV container=oci
+
+CMD ["/usr/lib/systemd/systemd"]

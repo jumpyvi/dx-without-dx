@@ -1,0 +1,7 @@
+# STEPS
+
+0. Read the script
+1. `just build-containerfile`
+2. `just extract-rootfs`
+3. `just run`
+4. `just add-to-virtman-flatpak`
