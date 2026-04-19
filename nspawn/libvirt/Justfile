@@ -1,11 +1,11 @@
 build-containerfile:
-    sudo podman build -t fedora-libvirt-nspawn .
+    sudo podman build -t libvirt-nspawn .
 
 extract-rootfs:
     just terminate || echo "Already stopped, ignore error..."
     sudo rm -rf /var/lib/machines/nspawn-libvirt
     sudo mkdir -p /var/lib/machines/nspawn-libvirt
-    sudo podman create --name nspawn-temp-build fedora-libvirt-nspawn
+    sudo podman create --name nspawn-temp-build libvirt-nspawn
     sudo podman export nspawn-temp-build | sudo tar -C /var/lib/machines/nspawn-libvirt -xf -
     sudo podman rm nspawn-temp-build
 
@@ -14,6 +14,9 @@ run:
     sudo systemd-nspawn -bD /var/lib/machines/nspawn-libvirt \
         --capability=CAP_NET_ADMIN,CAP_SYS_ADMIN \
         --property=Delegate=yes \
+        --property=DeviceAllow='char-usb_device rwm' \
+        --property=DeviceAllow='char-usb rwm' \
+        --bind=/dev/bus/usb \
         --bind=/dev/net/tun \
         --bind=/dev/kvm \
         --bind=/var/run/libvirt-nspawn:/run/libvirt \

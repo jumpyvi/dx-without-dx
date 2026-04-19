@@ -1,0 +1,32 @@
+[Unit]
+Description=Libvirt Service in Podman
+After=network-online.target
+
+[Container]
+Image=docker.io/library/ubuntu:noble
+Network=host
+
+PodmanArgs=--privileged --cgroupns=host --security-opt label=disable --pid=host
+
+# DBus access
+Mount=type=bind,source=/run/dbus/system_bus_socket,destination=/run/dbus/system_bus_socket
+
+# UDev
+# Please run: echo 'SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", MODE="0664", GROUP="plugdev"' | sudo tee /etc/udev/rules.d/50-spice-usb.rules
+# sudo udevadm control --reload-rules && sudo udevadm trigger
+Mount=type=bind,source=/run/udev,destination=/run/udev,ro
+
+# KVM
+Mount=type=bind,source=/dev/bus/usb,destination=/dev/bus/usb
+Mount=type=bind,source=/dev/kvm,destination=/dev/kvm
+Mount=type=bind,source=/run/libvirt-quadlet,destination=/run/libvirt
+
+# Storage
+Mount=type=bind,source=/var/lib/libvirt/images,destination=/var/lib/libvirt/images
+Mount=type=bind,source=/var/lib/libvirt-quadlet,destination=/var/lib/libvirt
+Mount=type=bind,source=/etc/libvirt-quadlet,destination=/etc/libvirt
+
+Exec=sh -c "apt-get update && apt-get install -y qemu-system-x86 libvirt-daemon-system libvirt-clients && virtlogd -d && libvirtd"
+
+[Install]
+WantedBy=multi-user.target

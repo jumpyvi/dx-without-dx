@@ -1,0 +1,34 @@
+# Variables
+USER := "jumpyvi"
+GROUP := "plugdev"
+QUADLET_NAME := "libvirt-quadlet.container"
+SOCKET_DIR := "/run/libvirt-quadlet"
+
+# Run the full setup
+setup:
+    #!/usr/bin/env bash
+    sudo mkdir -p /var/lib/images /var/lib/libvirt-quadlet /etc/libvirt-quadlet {{SOCKET_DIR}}
+    sudo chmod 775 {{SOCKET_DIR}}
+    sudo cp {{QUADLET_NAME}} /etc/containers/systemd/{{QUADLET_NAME}}
+
+    if ! groups "$USER" | grep -q "\bplugdev\b"; then
+        echo "User '$USER' is not in the plugdev group. User added, please reboot."
+        sudo mkdir -p /etc/sysusers.d/ && printf "m %s plugdev\n" "$(whoami)" | sudo tee /etc/sysusers.d/plugdev.conf > /dev/null
+        exit 0
+    fi
+    echo 'SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", MODE="0664", GROUP="{{GROUP}}"' | sudo tee /etc/udev/rules.d/50-spice-usb.rules
+    sudo udevadm control --reload-rules
+    sudo udevadm trigger
+    sudo systemctl daemon-reload
+    echo "Reboot and start the service"
+    
+
+run:
+    #!/usr/bin/env bash
+    sudo systemctl start libvirt-quadlet
+
+add-to-virtman:
+    #!/usr/bin/env bash
+    echo "Name it something you will remember, then close the window"
+    flatpak override --user --filesystem=/run/libvirt-quadlet org.virt_manager.virt-manager
+    flatpak run org.virt_manager.virt-manager -c "qemu:///system?socket=/run/libvirt-quadlet/libvirt-sock" --show-host-summary
