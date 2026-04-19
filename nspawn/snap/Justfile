@@ -1,0 +1,19 @@
+build-containerfile:
+    sudo podman build -t snap-nspawn .
+
+extract-rootfs:
+    just terminate || echo "Already stopped, ignore error..."
+    sudo rm -rf /var/lib/machines/nspawn-snap
+    sudo mkdir -p /var/lib/machines/nspawn-snap
+    sudo podman create --name nspawn-temp-build snap-nspawn
+    sudo podman export nspawn-temp-build | sudo tar -C /var/lib/machines/nspawn-snap -xf -
+    sudo podman rm nspawn-temp-build
+
+run:
+    # sudo mkdir -p /var/run/libvirt-nspawn
+    sudo systemd-nspawn -bD /var/lib/machines/nspawn-snap \
+        --property=Delegate=yes \
+        --system-call-filter=@privileged
+
+terminate:
+    sudo machinectl terminate nspawn-snap
