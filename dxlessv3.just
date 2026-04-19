@@ -5,7 +5,8 @@ setup-docker-rootful:
     echo "This is meant to run on non-DX Bluefin, GnomeOS/Dakota or Zirconium"
 
     if ! groups "$USER" | grep -q "\bdocker\b"; then
-        echo "User '$USER' is not in the docker group. Add the user to the docker group & reboot."
+        echo "User '$USER' is not in the docker group. User added, please reboot."
+        sudo mkdir -p /etc/sysusers.d/ && printf "m %s docker\n" "$(whoami)" | sudo tee /etc/sysusers.d/docker.conf > /dev/null
         exit 0
     fi
 
